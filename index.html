@@ -1,1 +1,330 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lunax Learning | Wie Wil Miljoenêr Wees? - Graad 8 EBW</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0a0a2e;color:white;min-height:100vh}
+.screen{display:none;min-height:100vh;padding:2rem;flex-direction:column;align-items:center;justify-content:center}
+.screen.active{display:flex}
+.logo{font-size:2rem;font-weight:bold;color:#FFD700;text-align:center;margin-bottom:0.25rem}
+.logo-sub{color:#aaa;text-align:center;margin-bottom:0.25rem;font-size:0.9rem}
+.logo-sub2{color:#FFD700;opacity:0.7;text-align:center;margin-bottom:2rem;font-size:0.8rem}
+.brand{font-size:0.75rem;color:#555;text-align:center;margin-bottom:1.5rem;letter-spacing:2px;text-transform:uppercase}
+.input-group{width:100%;max-width:400px;margin-bottom:1rem}
+.input-group label{display:block;font-size:13px;color:#aaa;margin-bottom:4px}
+.input-group input,.input-group select{width:100%;padding:10px 14px;background:#1a1a4e;border:1px solid #333;border-radius:8px;color:white;font-size:15px}
+.input-group select option{background:#1a1a4e}
+.btn-main{background:#FFD700;color:#0a0a2e;border:none;border-radius:8px;padding:14px 40px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:1rem}
+.btn-main:hover{background:#FFC200}
+.game-wrap{position:relative;width:100%;max-width:800px;display:flex;gap:0}
+.main-content{flex:1;display:flex;flex-direction:column;align-items:center;padding-right:140px}
+.prize-ladder{position:absolute;right:0;top:0;bottom:0;width:130px;background:#0d0d3a;padding:0.75rem 0.5rem;border-radius:8px}
+.prize-item{font-size:11px;padding:3px 6px;border-radius:4px;color:#555;text-align:right;margin-bottom:1px}
+.prize-item.current{color:#FFD700;font-weight:bold;background:#1a1a4e}
+.prize-item.milestone{color:#90EE90}
+.prize-item.passed{color:#333;text-decoration:line-through}
+.hud{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:0.5rem}
+.hud-info{font-size:12px;color:#aaa}
+.hud-prize{font-size:15px;color:#FFD700;font-weight:bold}
+.lifelines{display:flex;gap:8px;margin:0.5rem 0;flex-wrap:wrap;justify-content:center}
+.ll-btn{background:#2a2a6e;border:1px solid #4444aa;border-radius:8px;padding:7px 14px;color:white;cursor:pointer;font-size:12px}
+.ll-btn:hover:not(:disabled){border-color:#FFD700}
+.ll-btn:disabled{opacity:0.3;cursor:not-allowed}
+.question-box{background:#1a1a4e;border:2px solid #FFD700;border-radius:12px;padding:1.25rem;text-align:center;margin:0.5rem 0;width:100%}
+.question-num{font-size:11px;color:#888;margin-bottom:6px}
+.question-text{font-size:1rem;line-height:1.5;color:white}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin:0.5rem 0}
+.ans-btn{background:#1a1a4e;border:2px solid #4444aa;border-radius:8px;padding:12px;color:white;cursor:pointer;font-size:13px;text-align:left;line-height:1.4;transition:all 0.2s}
+.ans-btn:hover:not(:disabled){border-color:#FFD700;background:#2a2a6e}
+.ans-btn.correct{background:#1a5e1a;border-color:#4CAF50}
+.ans-btn.wrong{background:#5e1a1a;border-color:#f44336}
+.ans-btn.hidden{opacity:0.1;pointer-events:none}
+.ans-btn:disabled{cursor:default}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;z-index:100}
+.modal-overlay.open{display:flex}
+.modal-box{background:#1a1a4e;border:2px solid #FFD700;border-radius:12px;padding:1.5rem;max-width:420px;width:90%;text-align:center}
+.modal-box h3{color:#FFD700;margin-bottom:0.75rem}
+.modal-box p{color:#ccc;font-size:13px;line-height:1.6;margin-bottom:0.5rem}
+.modal-btns{display:flex;gap:10px;justify-content:center;margin-top:1rem;flex-wrap:wrap}
+.audience-bars{display:flex;gap:12px;align-items:flex-end;height:90px;margin:0.75rem 0;justify-content:center}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:48px;background:#4444aa;border-radius:4px 4px 0 0;transition:height 1s;min-height:4px}
+.bar-label{font-size:11px;color:#ccc}
+.bar-pct{font-size:11px;color:#FFD700;font-weight:bold}
+.result-icon{font-size:4rem;margin-bottom:0.75rem}
+.result-prize{font-size:2rem;color:#FFD700;font-weight:bold;margin-bottom:0.5rem}
+.result-name{color:#aaa;font-size:13px;margin-bottom:1rem}
+.proof-box{background:#1a1a4e;border:1px solid #333;border-radius:8px;padding:1rem;margin:0.75rem 0;width:100%;max-width:380px;text-align:center}
+.proof-label{color:#aaa;font-size:12px;margin-bottom:0.5rem}
+.proof-code{color:#FFD700;font-size:14px;font-weight:bold;letter-spacing:1px}
+.proof-date{color:#555;font-size:11px;margin-top:4px}
+.friend-qa{background:#0a0a2e;border-radius:8px;padding:0.75rem;margin:0.75rem 0;font-size:12px;color:#ddd;text-align:left;line-height:1.8}
+footer{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:6px;font-size:10px;color:#333;background:#050518;letter-spacing:1px}
+@media(max-width:600px){.answers{grid-template-columns:1fr}.main-content{padding-right:0}.prize-ladder{display:none}}
+</style>
+</head>
+<body>
 
+<!-- PROFIEL SKERM -->
+<div id="profileScreen" class="screen active">
+  <div class="logo">Wie Wil Miljoenêr Wees?</div>
+  <div class="logo-sub">Graad 8 — EBW</div>
+  <div class="logo-sub2">Nasionale Begroting · Lewenstandaard · Finansiële Geletterdheid</div>
+  <div class="brand">Lunax Learning</div>
+  <div class="input-group"><label>Naam</label><input id="pNaam" placeholder="Jou naam" /></div>
+  <div class="input-group"><label>Van</label><input id="pVan" placeholder="Jou van" /></div>
+  <div class="input-group"><label>Graad</label>
+    <select id="pGraad">
+      <option value="">Kies graad...</option>
+      <option>Graad 8</option><option>Graad 9</option>
+      <option>Graad 10</option><option>Graad 11</option><option>Graad 12</option>
+    </select>
+  </div>
+  <div class="input-group"><label>Klas (bv. 8A)</label><input id="pKlas" placeholder="Jou klas" /></div>
+  <button class="btn-main" onclick="startGame()">Speel Nou!</button>
+</div>
+
+<!-- SPEEL SKERM -->
+<div id="gameScreen" class="screen" style="justify-content:flex-start;padding-top:1rem;">
+  <div class="game-wrap">
+    <div class="main-content">
+      <div class="hud">
+        <div class="hud-info">Vraag <span id="qNum">1</span> van 15</div>
+        <div class="hud-prize" id="currentPrize">R1 000</div>
+      </div>
+      <div class="lifelines">
+        <button class="ll-btn" id="ll5050" onclick="use5050()">50/50</button>
+        <button class="ll-btn" id="llAud" onclick="useAudience()">Publiek</button>
+        <button class="ll-btn" id="llFriend" onclick="useFriend()">Bel 'n Vriend</button>
+      </div>
+      <div class="question-box">
+        <div class="question-num" id="questionNum">Vraag 1 van 15</div>
+        <div class="question-text" id="questionText">Laai vraag...</div>
+      </div>
+      <div class="answers" id="answersGrid"></div>
+    </div>
+    <div class="prize-ladder" id="prizeLadder"></div>
+  </div>
+</div>
+
+<!-- RESULTAAT SKERM -->
+<div id="resultScreen" class="screen">
+  <div class="result-icon" id="resultIcon">🏆</div>
+  <div class="result-prize" id="resultPrize">R1 000 000!</div>
+  <div class="result-name" id="resultName"></div>
+  <div class="proof-box">
+    <div class="proof-label">Wys hierdie skerm vir jou onderwyser as bewys</div>
+    <div class="proof-code" id="proofCode"></div>
+    <div class="proof-date" id="proofDate"></div>
+  </div>
+  <button class="btn-main" onclick="resetGame()">Speel Weer</button>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <div id="modalContent"></div>
+    <div class="modal-btns" id="modalBtns"></div>
+  </div>
+</div>
+
+<footer>© 2026 Lunax Learning | lunax-learning.github.io</footer>
+
+<script>
+const prizes=['R1 000','R2 000','R3 000','R5 000','R10 000','R20 000','R50 000','R75 000','R150 000','R250 000','R500 000','R750 000','R1 000 000'];
+const milestones=[4,9];
+const questions=[
+  {q:"Die regering beplan om besteding aan openbare hospitale en onderwys te verhoog en moet meer belasting invorder. Hierdie plan is deel van die:",a:["Rekeningkundige vergelyking","Nasionale begroting","Lewenstandaard","Brondokument"],c:1},
+  {q:"'n Kliënt koop goedere en betaal kontant. Watter brondokument moet die besigheid aan die kliënt uitreik as bewys van betaling?",a:["Kwitansie","Faktuur","Depositostrokie","Kredietnota"],c:0},
+  {q:"Watter faktor het die GROOTSTE impak op die verbetering van 'n persoon se lewenstandaard?",a:["Slegs toegang tot luukse goedere","Om 'n hoë inkomste en toegang tot dienste te hê","Geen vervoer hê nie","Om ver van skole af te woon"],c:1},
+  {q:"Waarom is brondokumente belangrik in rekeningkunde?",a:["Hulle verminder besigheidsuitgawes","Hulle verhoog aanspreeklikhede","Hulle verskaf bewys van transaksies","Hulle verhoog besigheidswinste"],c:2},
+  {q:"'n Besigheid het bates ter waarde van R20 000 en laste van R8 000. Wat is die eienaarsbelang?",a:["R20 000","R28 000","R8 000","R12 000"],c:3},
+  {q:"Wat beskryf 'ekonomiese ongelykheid' die beste?",a:["Geld in die bank deponeer","Die mate van rykdom wat 'n persoon besit","Die gaping in rykdom en inkomste tussen ryk en arm","Sekere groepe se sosiale status"],c:2},
+  {q:"Wanneer word 'n bankdepositostrokie gebruik?",a:["Om 'n faktuur te betaal","Wanneer geld in die besigheid se bankrekening gedeponeer word","Om kontantverkope aan te teken","Om 'n lening te kry"],c:1},
+  {q:"Wat is die doel van 'n kasregisterrol (KRR)?",a:["Bewys van 'n banktransaksie","Een tipe lening","Om kontantverkope op 'n kasregister aan te teken","Die rekeningkundige vergelyking"],c:2},
+  {q:"Wat is 'sosiale ongelykheid'?",a:["Die gaping in inkomste tussen ryk en arm","Wanneer sekere groepe nie dieselfde sosiale status en toegang tot hulpbronne het nie","Die nasionale begroting se tekorte","Wanneer een persoon meer belasting betaal"],c:1},
+  {q:"Watter indirekte belasting betaal jy wanneer jy kruideniersware by SPAR koop?",a:["Invoerbelasting","Brandstofheffing","BTW (Belasting op Toegevoegde Waarde)","Inkomstebelasting"],c:2},
+  {q:"Watter belasting betaal jy wanneer jy items van 'n aanlyn platform soos Amazon invoer?",a:["BTW","Invoerbelasting","Brandstofheffing","Dividendbelasting"],c:1},
+  {q:"Bianca deponeer R14 000 kapitaal in haar besigheidsrekening. Wat gebeur met die bates?",a:["Bates verminder met R14 000","Bates bly dieselfde","Bates verhoog met R14 000","Laste verhoog met R14 000"],c:2},
+  {q:"Bianca betaal huur van R5 500 kontant. Wat is die effek op die rekeningkundige vergelyking?",a:["Bates verhoog, uitgawes verminder","Bates verminder, uitgawes verhoog","Laste verhoog, bates bly dieselfde","Eienaarsbelang verhoog"],c:1},
+  {q:"Thabo stap 3 km skool toe en het geen internet nie. Ayesha word gery en het internet. Watter konsep beskryf hierdie verskil die beste?",a:["Ekonomiese groei","Verskil in lewenstandaard","Nasionale begroting","Finansiële geletterdheid"],c:1},
+  {q:"Hoe kan onderwys 'n persoon se toekomstige lewenstandaard verbeter?",a:["Dit verlaag belasting outomaties","Dit gee toegang tot beter werk en hoër inkomste","Dit verminder lewenskoste outomaties","Dit sorg vir gratis behuising"],c:1}
+];
+
+let profile={},currentQ=0,usedLifelines={f5050:false,fAud:false,fFriend:false},answered=false,hiddenAnswers=[];
+
+function startGame(){
+  const naam=document.getElementById('pNaam').value.trim();
+  const van=document.getElementById('pVan').value.trim();
+  const graad=document.getElementById('pGraad').value;
+  const klas=document.getElementById('pKlas').value.trim();
+  if(!naam||!van||!graad||!klas){alert('Vul asseblief al jou besonderhede in!');return;}
+  profile={naam,van,graad,klas};
+  currentQ=0;
+  usedLifelines={f5050:false,fAud:false,fFriend:false};
+  hiddenAnswers=[];
+  document.getElementById('profileScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+  buildLadder();
+  loadQuestion();
+}
+
+function buildLadder(){
+  const ladder=document.getElementById('prizeLadder');
+  ladder.innerHTML='';
+  for(let i=prizes.length-1;i>=0;i--){
+    const div=document.createElement('div');
+    div.className='prize-item'+(milestones.includes(i)?' milestone':'');
+    div.id='prize_'+i;
+    div.textContent=prizes[i];
+    ladder.appendChild(div);
+  }
+  updateLadder();
+}
+
+function updateLadder(){
+  prizes.forEach((_,i)=>{
+    const el=document.getElementById('prize_'+i);
+    if(!el)return;
+    el.className='prize-item';
+    if(milestones.includes(i))el.className+=' milestone';
+    if(i===currentQ)el.className+=' current';
+    if(i<currentQ)el.className+=' passed';
+  });
+}
+
+function loadQuestion(){
+  answered=false;hiddenAnswers=[];
+  document.getElementById('ll5050').disabled=usedLifelines.f5050;
+  document.getElementById('llAud').disabled=usedLifelines.fAud;
+  document.getElementById('llFriend').disabled=usedLifelines.fFriend;
+  const q=questions[currentQ];
+  document.getElementById('qNum').textContent=currentQ+1;
+  document.getElementById('questionNum').textContent='Vraag '+(currentQ+1)+' van 15';
+  document.getElementById('currentPrize').textContent=prizes[currentQ];
+  document.getElementById('questionText').textContent=q.q;
+  updateLadder();
+  const letters=['A','B','C','D'];
+  const grid=document.getElementById('answersGrid');
+  grid.innerHTML='';
+  q.a.forEach((ans,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';btn.id='ans_'+i;
+    btn.textContent=letters[i]+': '+ans;
+    btn.onclick=()=>selectAnswer(i);
+    grid.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx){
+  if(answered)return;
+  answered=true;
+  const q=questions[currentQ];
+  document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
+  const chosen=document.getElementById('ans_'+idx);
+  if(idx===q.c){
+    chosen.classList.add('correct');
+    setTimeout(()=>{
+      if(currentQ>=prizes.length-1){showResult(true);return;}
+      currentQ++;loadQuestion();
+    },1600);
+  }else{
+    chosen.classList.add('wrong');
+    document.getElementById('ans_'+q.c).classList.add('correct');
+    setTimeout(()=>showResult(false),1800);
+  }
+}
+
+function use5050(){
+  if(usedLifelines.f5050||answered)return;
+  usedLifelines.f5050=true;
+  document.getElementById('ll5050').disabled=true;
+  const q=questions[currentQ];
+  const wrongs=[0,1,2,3].filter(i=>i!==q.c&&!hiddenAnswers.includes(i));
+  wrongs.sort(()=>Math.random()-0.5).slice(0,2).forEach(i=>{
+    document.getElementById('ans_'+i).classList.add('hidden');
+    hiddenAnswers.push(i);
+  });
+}
+
+function useAudience(){
+  if(usedLifelines.fAud||answered)return;
+  usedLifelines.fAud=true;
+  document.getElementById('llAud').disabled=true;
+  const q=questions[currentQ];
+  const pcts=[0,0,0,0];
+  pcts[q.c]=Math.floor(Math.random()*25)+55;
+  let rem=100-pcts[q.c];
+  const others=[0,1,2,3].filter(i=>i!==q.c&&!hiddenAnswers.includes(i));
+  others.forEach((i,idx)=>{
+    pcts[i]=idx===others.length-1?rem:Math.floor(Math.random()*rem*0.5);
+    rem-=pcts[i];
+  });
+  const letters=['A','B','C','D'];
+  showModal('Publiek Stem',`
+    <div class="audience-bars">
+      ${pcts.map((p,i)=>hiddenAnswers.includes(i)?'':
+        `<div class="bar-wrap">
+          <div class="bar-pct">${p}%</div>
+          <div class="bar" style="height:${Math.max(p*0.75,4)}px;"></div>
+          <div class="bar-label">${letters[i]}</div>
+        </div>`).join('')}
+    </div>
+  `,[{label:'Dankie!',fn:'closeModal()'}]);
+}
+
+function useFriend(){
+  if(usedLifelines.fFriend||answered)return;
+  usedLifelines.fFriend=true;
+  document.getElementById('llFriend').disabled=true;
+  const q=questions[currentQ];
+  const letters=['A','B','C','D'];
+  showModal("Bel 'n Vriend",`
+    <p>Draai na 'n klasmaat en wys hulle hierdie skerm!</p>
+    <div class="friend-qa">
+      <strong style="color:#FFD700;">Vraag:</strong><br>${q.q}<br><br>
+      ${q.a.map((a,i)=>`${letters[i]}: ${a}`).join('<br>')}
+    </div>
+    <p>Vra: "Watter antwoord dink jy is reg?"</p>
+  `,[{label:'Terug na Spel',fn:'closeModal()'}]);
+}
+
+function showModal(title,content,btns){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalContent').innerHTML=content;
+  document.getElementById('modalBtns').innerHTML=btns.map(b=>
+    `<button class="btn-main" onclick="${b.fn}">${b.label}</button>`).join('');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+
+function showResult(won){
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('resultScreen').classList.add('active');
+  const safeIdx=currentQ>9?9:currentQ>4?4:-1;
+  const safePrize=safeIdx>=0?prizes[safeIdx]:'R0';
+  const finalPrize=won?'R1 000 000':(currentQ===0?'R0':safePrize);
+  document.getElementById('resultIcon').textContent=won?'🏆':currentQ>4?'🎖️':'😢';
+  document.getElementById('resultPrize').textContent=won?'R1 000 000!':finalPrize+(currentQ>0&&!won?' (Veilige bedrag)':'');
+  document.getElementById('resultName').textContent=`${profile.naam} ${profile.van} | ${profile.graad} ${profile.klas}`;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('af-ZA')+' '+now.toLocaleTimeString('af-ZA',{hour:'2-digit',minute:'2-digit'});
+  const code=`${profile.naam[0]}${profile.van[0]}-${profile.graad.replace('Graad ','G')}-${profile.klas}-V${currentQ}-${now.getTime().toString(36).slice(-5).toUpperCase()}`;
+  document.getElementById('proofCode').textContent='Bewyskode: '+code;
+  document.getElementById('proofDate').textContent=dateStr;
+}
+
+function resetGame(){
+  document.getElementById('resultScreen').classList.remove('active');
+  document.getElementById('profileScreen').classList.add('active');
+}
+</script>
+</body>
+</html>
